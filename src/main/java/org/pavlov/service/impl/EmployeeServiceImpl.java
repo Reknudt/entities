@@ -1,10 +1,7 @@
 package org.pavlov.service.impl;
 
 import lombok.AllArgsConstructor;
-import org.pavlov.dto.request.EmployeeRequest;
-import org.pavlov.dto.response.EmployeeResponse;
 import org.pavlov.exception.ResourceNotFoundException;
-import org.pavlov.mapper.EmployeeMapper;
 import org.pavlov.model.Employee;
 import org.pavlov.repository.EmployeeRepository;
 import org.pavlov.service.EmployeeService;
@@ -17,7 +14,6 @@ import java.util.Optional;
 @AllArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
-    private final EmployeeMapper employeeMapper;
     private final EmployeeRepository employeeRepository;
 
     @Override

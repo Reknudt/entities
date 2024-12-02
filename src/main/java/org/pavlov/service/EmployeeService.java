@@ -1,7 +1,5 @@
 package org.pavlov.service;
 
-import org.pavlov.dto.request.EmployeeRequest;
-import org.pavlov.dto.response.EmployeeResponse;
 import org.pavlov.model.Employee;
 
 import java.util.List;

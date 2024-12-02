@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.info.Info;
 @OpenAPIDefinition(
         info = @Info(
                 title = "Entities manipulation Api",
-                description = "API система с добавлением сущностей студентов, групп и преподавателей",
+                description = "API система с добавлением сущностей сотрудников, отедлов и задач",
                 version = "1.0.0",
                 contact = @Contact(
                         name = "Pavlov Kirill",

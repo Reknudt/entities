@@ -1,20 +1,19 @@
 package org.pavlov.service;
 
-import org.pavlov.dto.request.DepartmentRequest;
-import org.pavlov.dto.response.DepartmentResponse;
+import org.pavlov.model.Department;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface DepartmentService {
 
-    void createDepartment(DepartmentRequest departmentRequest);
+    void createDepartment(Department departmentRequest);
 
-    void updateDepartment(Long id, DepartmentRequest departmentRequest);
+    void updateDepartment(Long id, Department departmentRequest);
 
-    Optional<DepartmentResponse> getDepartment(Long id);
+    Optional<Department> getDepartment(Long id);
 
-    List<DepartmentResponse> getAllDepartments();
+    List<Department> getAllDepartments();
 
     void deleteDepartment(Long id);
 }

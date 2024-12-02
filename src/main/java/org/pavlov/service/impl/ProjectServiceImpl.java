@@ -1,10 +1,7 @@
 package org.pavlov.service.impl;
 
 import lombok.AllArgsConstructor;
-import org.pavlov.dto.request.ProjectRequest;
-import org.pavlov.dto.response.ProjectResponse;
 import org.pavlov.exception.ResourceNotFoundException;
-import org.pavlov.mapper.ProjectMapper;
 import org.pavlov.model.Project;
 import org.pavlov.repository.ProjectRepository;
 import org.pavlov.service.ProjectService;
@@ -17,35 +14,34 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
 
-    private final ProjectMapper projectMapper;
     private final ProjectRepository projectRepository;
     
     @Override
-    public void createProject(ProjectRequest projectRequest) {
-        Project project = projectMapper.createRequestToEntity(projectRequest);
+    public void createProject(Project projectRequest) {
+
+        projectRepository.save(projectRequest);
+    }
+
+    @Override
+    public void updateProject(Long id, Project projectRequest) {
+        Project project = findByIdOrThrow(id);
+
+        project.setName(projectRequest.getName());
+        project.setDepartments(projectRequest.getDepartments());
 
         projectRepository.save(project);
     }
 
     @Override
-    public void updateProject(Long id, ProjectRequest projectRequest) {
+    public Optional<Project> getProject(Long id) {
         Project project = findByIdOrThrow(id);
 
-        project = projectMapper.updateProjectFromRequest(projectRequest, project);
-        projectRepository.save(project);
+        return Optional.ofNullable(project);
     }
 
     @Override
-    public Optional<ProjectResponse> getProject(Long id) {
-        Project project = findByIdOrThrow(id);
-
-        return Optional.ofNullable(projectMapper.entityToResponse(project));
-    }
-
-    @Override
-    public List<ProjectResponse> getAllProjects() {
+    public List<Project> getAllProjects() {
         return projectRepository.findAll().stream()
-                .map(projectMapper::toResponse)
                 .toList();
     }
 

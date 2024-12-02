@@ -1,10 +1,7 @@
 package org.pavlov.service.impl;
 
 import lombok.AllArgsConstructor;
-import org.pavlov.dto.request.DepartmentRequest;
-import org.pavlov.dto.response.DepartmentResponse;
 import org.pavlov.exception.ResourceNotFoundException;
-import org.pavlov.mapper.DepartmentMapper;
 import org.pavlov.model.Department;
 import org.pavlov.repository.DepartmentRepository;
 import org.pavlov.service.DepartmentService;
@@ -17,36 +14,36 @@ import java.util.Optional;
 @AllArgsConstructor
 public class DepartmentServiceImpl implements DepartmentService {
 
-    private final DepartmentMapper departmentMapper;
     private final DepartmentRepository departmentRepository;
 
     @Override
-    public void createDepartment(DepartmentRequest departmentRequest) {
-        Department department = departmentMapper.createRequestToEntity(departmentRequest);
+    public void createDepartment(Department departmentRequest) {
 
-        departmentRepository.save(department);
+        departmentRepository.save(departmentRequest);
     }
 
     @Override
-    public void updateDepartment(Long id, DepartmentRequest departmentRequest) {
+    public void updateDepartment(Long id, Department departmentRequest) {
         Department department = findByIdOrThrow(id);
 
-        department = departmentMapper.updateDepartmentFromRequest(departmentRequest, department);
+        department.setBoss_id(departmentRequest.getBoss_id());
+        department.setEmployees(departmentRequest.getEmployees());
+        department.setName(departmentRequest.getName());
+        department.setProjects(departmentRequest.getProjects());
 
         departmentRepository.save(department);
     }
     
     @Override
-    public Optional<DepartmentResponse> getDepartment(Long id) {
+    public Optional<Department> getDepartment(Long id) {
         Department department = findByIdOrThrow(id);
 
-        return Optional.ofNullable(departmentMapper.entityToResponse(department));
+        return Optional.ofNullable(department);
     }
 
     @Override
-    public List<DepartmentResponse> getAllDepartments() {
+    public List<Department> getAllDepartments() {
         return departmentRepository.findAll().stream()
-                .map(departmentMapper::toResponse)
                 .toList();
     }
 

@@ -1,20 +1,19 @@
 package org.pavlov.service;
 
-import org.pavlov.dto.request.ProjectRequest;
-import org.pavlov.dto.response.ProjectResponse;
+import org.pavlov.model.Project;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface ProjectService {
 
-    void createProject(ProjectRequest projectRequest);
+    void createProject(Project projectRequest);
 
-    void updateProject(Long id, ProjectRequest projectRequest);
+    void updateProject(Long id, Project projectRequest);
 
-    Optional<ProjectResponse> getProject(Long id);
+    Optional<Project> getProject(Long id);
 
-    List<ProjectResponse> getAllProjects();
+    List<Project> getAllProjects();
 
     void deleteProject(Long id);
 }
