@@ -12,7 +12,7 @@ public interface EmployeeMapper {
 
     Employee createRequestToEntity(EmployeeRequest employeeRequest);
 
-    Employee updateStudentFromRequest(EmployeeRequest employeeRequest, Employee employee);
+//    Employee updateEmployeeFromRequest(Employee employeeRequest, Employee employee);
 
     EmployeeResponse toResponse(Employee employee);
 

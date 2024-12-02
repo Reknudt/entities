@@ -28,25 +28,28 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void updateEmployee(Long id, EmployeeRequest employeeRequest) {
+    public void updateEmployee(Long id, Employee employeeRequest) {
         Employee employee = findByIdOrThrow(id);
 
-        employee = employeeMapper.updateStudentFromRequest(employeeRequest, employee);
+//        employee = employeeMapper.updateEmployeeFromRequest(employeeRequest, employee);
+
+        employee.setName(employeeRequest.getName());
+        employee.setBoss_id(employeeRequest.getBoss_id());
+        employee.setDepartment_id(employeeRequest.getDepartment_id());
 
         employeeRepository.save(employee);
     }
 
     @Override
-    public Optional<EmployeeResponse> getEmployee(Long id) {
+    public Optional<Employee> getEmployee(Long id) {
         Employee employee = findByIdOrThrow(id);
 
-        return Optional.ofNullable(employeeMapper.entityToResponse(employee));
+        return Optional.ofNullable(employee);
     }
 
     @Override
-    public List<EmployeeResponse> getAllEmployees() {
+    public List<Employee> getAllEmployees() {
         return employeeRepository.findAll().stream()
-                .map(employeeMapper::toResponse)
                 .toList();
     }
 

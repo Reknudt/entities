@@ -11,11 +11,11 @@ public interface EmployeeService {
 
     void createEmployee(Employee employeeRequest);
 
-    void updateEmployee(Long id, EmployeeRequest employeeRequest);
+    void updateEmployee(Long id, Employee employeeRequest);
 
-    Optional<EmployeeResponse> getEmployee(Long id);
+    Optional<Employee> getEmployee(Long id);
 
-    List<EmployeeResponse> getAllEmployees();
+    List<Employee> getAllEmployees();
 
     void deleteEmployee(Long id);
 }
