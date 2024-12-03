@@ -6,6 +6,7 @@ import org.pavlov.model.Project;
 import org.pavlov.repository.ProjectRepository;
 import org.pavlov.service.ProjectService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,13 +16,15 @@ import java.util.Optional;
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
-    
+
+    @Transactional
     @Override
     public void createProject(Project projectRequest) {
 
         projectRepository.save(projectRequest);
     }
 
+    @Transactional
     @Override
     public void updateProject(Long id, Project projectRequest) {
         Project project = findByIdOrThrow(id);
@@ -32,13 +35,16 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.save(project);
     }
 
+    @Transactional
     @Override
     public Optional<Project> getProject(Long id) {
-        Project project = findByIdOrThrow(id);
+        return projectRepository.getOneWith(id);
+//        Project project = findByIdOrThrow(id);
 
-        return Optional.ofNullable(project);
+//        return Optional.ofNullable(project);
     }
 
+    @Transactional
     @Override
     public List<Project> getAllProjects() {
         return projectRepository.findAll().stream()

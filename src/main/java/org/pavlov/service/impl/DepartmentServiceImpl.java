@@ -6,6 +6,7 @@ import org.pavlov.model.Department;
 import org.pavlov.repository.DepartmentRepository;
 import org.pavlov.service.DepartmentService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,31 +17,37 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     private final DepartmentRepository departmentRepository;
 
+    @Transactional
     @Override
     public void createDepartment(Department departmentRequest) {
 
         departmentRepository.save(departmentRequest);
     }
 
+    @Transactional
     @Override
     public void updateDepartment(Long id, Department departmentRequest) {
         Department department = findByIdOrThrow(id);
 
-        department.setBoss_id(departmentRequest.getBoss_id());
+        department.setBossId(departmentRequest.getBossId());
         department.setEmployees(departmentRequest.getEmployees());
         department.setName(departmentRequest.getName());
         department.setProjects(departmentRequest.getProjects());
 
         departmentRepository.save(department);
     }
-    
+
+    @Transactional
     @Override
     public Optional<Department> getDepartment(Long id) {
-        Department department = findByIdOrThrow(id);
+        return departmentRepository.getOneWith(id);
 
-        return Optional.ofNullable(department);
+//        Department department = findByIdOrThrow(id);
+//
+//        return Optional.ofNullable(department);
     }
 
+    @Transactional
     @Override
     public List<Department> getAllDepartments() {
         return departmentRepository.findAll().stream()

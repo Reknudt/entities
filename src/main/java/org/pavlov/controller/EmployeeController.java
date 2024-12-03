@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -54,6 +55,16 @@ public class EmployeeController {
 
         return employeeService.getEmployee(id);
     }
+
+    @GetMapping("bossId/{id}")
+    @Operation(
+            summary = "Получение сотрудника по boss ID",
+            description = "Для получения отправьте boss ID")
+    public List<Employee> getByBossID(@PathVariable Long id) {
+
+        return employeeService.getAllByBoss(id);
+    }
+
 
     @GetMapping
     @Operation(

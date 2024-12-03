@@ -24,12 +24,12 @@ public class Employee implements Serializable {
     private Long id;
 
     @NotBlank
-    @Column(name = "name")
+//    @Column(name = "name")
     private String name;
 
-    @Column(name = "boss_id")
-    private Long boss_id;
+//    @Column(name = "boss_id")
+    private Long bossId;
 
-    @Column(name = "department_id")
-    private Long department_id;
+//    @Column(name = "department_id")
+    private Long departmentId;
 }
