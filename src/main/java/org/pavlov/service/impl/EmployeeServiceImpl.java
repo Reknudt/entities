@@ -63,6 +63,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Transactional
     @Override
+    public List<Employee> getAllByBossAlt(Long bossId) {
+        return employeeRepository.findByBossIdRecursive(bossId)
+                .stream()
+                .toList();
+    }
+
+    @Transactional
+    @Override
     public List<Employee> getAllByBoss(Long bossId) {
         List<Employee> bossesEmployee = employeeRepository
                 .findByBossId(bossId)

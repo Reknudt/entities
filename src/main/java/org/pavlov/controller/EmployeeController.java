@@ -65,6 +65,15 @@ public class EmployeeController {
         return employeeService.getAllByBoss(id);
     }
 
+    @GetMapping("bossIdAlt/{id}")
+    @Operation(
+            summary = "Получение сотрудника по boss ID qu",
+            description = "Для получения отправьте boss ID")
+    public List<Employee> getByBossIDAlt(@PathVariable Long id) {
+
+        return employeeService.getAllByBoss(id);
+    }
+
 
     @GetMapping
     @Operation(
