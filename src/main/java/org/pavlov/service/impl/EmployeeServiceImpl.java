@@ -3,7 +3,9 @@ package org.pavlov.service.impl;
 import lombok.AllArgsConstructor;
 import org.pavlov.exception.ResourceNotFoundException;
 import org.pavlov.model.Employee;
+import org.pavlov.model.Task;
 import org.pavlov.repository.EmployeeRepository;
+import org.pavlov.response.TaskResponse;
 import org.pavlov.service.EmployeeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,8 +23,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     @Override
     public void createEmployee(Employee employeeRequest) {
-        //Employee employee = employeeMapper.createRequestToEntity(employeeRequest);
-
         employeeRepository.save(employeeRequest);
     }
 
@@ -30,8 +30,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public void updateEmployee(Long id, Employee employeeRequest) {
         Employee employee = findByIdOrThrow(id);
-
-//        employee = employeeMapper.updateEmployeeFromRequest(employeeRequest, employee);
 
         employee.setName(employeeRequest.getName());
         employee.setBossId(employeeRequest.getBossId());
@@ -42,10 +40,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Transactional
     @Override
-    public Optional<Employee> getEmployee(Long id) {
-        Employee employee = findByIdOrThrow(id);
-
-        return Optional.ofNullable(employee);
+    public Employee getEmployee(Long id) {
+        return findByIdOrThrow(id);
     }
 
     @Transactional
@@ -57,13 +53,34 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void deleteEmployee(Long id) {
-
         employeeRepository.deleteById(id);
     }
 
+    @Override
+    public Optional<List<TaskResponse>> getEmployeeTaskResponses(Long id) {
+        Employee employee = findByIdOrThrow(id);
+        List<Task> tasks = employee.getTasks();
+        List<TaskResponse> taskResponses = new ArrayList<>();
+
+        for (Task task: tasks) {
+            taskResponses.add(new TaskResponse(task));
+        }
+
+        return Optional.of(taskResponses);
+    }
+
+    @Override
+    public Optional<List<Task>> getEmployeeTasks(Long id) {
+        Employee employee = findByIdOrThrow(id);
+        List<Task> tasks = employee.getTasks();
+
+        return Optional.ofNullable(tasks);
+    }
+
+
     @Transactional
     @Override
-    public List<Employee> getAllByBossAlt(Long bossId) {
+    public List<Long> getAllByBossAlt(Long bossId) {
         return employeeRepository.findByBossIdRecursive(bossId)
                 .stream()
                 .toList();
@@ -89,13 +106,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
             newList.addAll(newBossesEmployee);
         }
-
-
         return newList;
     }
 
 
-    private Employee findByIdOrThrow(Long id) {
+    public Employee findByIdOrThrow(Long id) {
         return employeeRepository.findById(id)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Resource not found"));
