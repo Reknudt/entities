@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -39,12 +38,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Transactional
     @Override
-    public Optional<Department> getDepartment(Long id) {
-        return departmentRepository.getOneWith(id);
-
-//        Department department = findByIdOrThrow(id);
-//
-//        return Optional.ofNullable(department);
+    public Department getDepartment(Long id) {
+        return findByIdOrThrow(id);
     }
 
     @Transactional
@@ -63,6 +58,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     private Department findByIdOrThrow(Long id) {
         return departmentRepository.findById(id)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Resource not found"));
+                        () -> new ResourceNotFoundException("Department "+ id + " not found"));
     }
 }

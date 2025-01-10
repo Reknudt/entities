@@ -54,8 +54,7 @@ public class DepartmentController {
     @Operation(
             summary = "Получение отдела по ID",
             description = "Для получения отправьте ID")
-    public Optional<Department> getDepartmentByID(@PathVariable Long id) {
-
+    public Department getDepartmentByID(@PathVariable Long id) {
         return departmentService.getDepartment(id);
     }
 
@@ -63,7 +62,6 @@ public class DepartmentController {
     @Operation(
             summary = "Получение всех отделов")
     public List<Department> getAllDepartments() {
-
         return departmentService.getAllDepartments();
     }
 
@@ -73,7 +71,6 @@ public class DepartmentController {
             summary = "Удаление отдела по ID",
             description = "Для удаления отправьте ID")
     public void deleteDepartmentByID(@PathVariable Long id) {
-
         departmentService.deleteDepartment(id);
     }
 }

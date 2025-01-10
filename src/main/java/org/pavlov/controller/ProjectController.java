@@ -36,7 +36,6 @@ public class ProjectController {
             summary = "Добавление проекта",
             description = "Сохранение сущности в бд")
     public void createProject(@RequestBody @Valid Project projectRequest) {
-
         projectService.createProject(projectRequest);
     }
 
@@ -46,7 +45,6 @@ public class ProjectController {
             description = "Обновление сущности в бд")
     public void updateProject(@PathVariable Long id,
                               @RequestBody @Valid Project projectRequest) {
-
         projectService.updateProject(id, projectRequest);
     }
 
@@ -54,8 +52,7 @@ public class ProjectController {
     @Operation(
             summary = "Получение проекта по ID",
             description = "Для получения отправьте ID")
-    public Optional<Project> getByProjectID(@PathVariable Long id) {
-
+    public Project getByProjectID(@PathVariable Long id) {
         return projectService.getProject(id);
     }
 

@@ -72,7 +72,6 @@ public class EmployeeController {
             summary = "Получение задания по ID сотрудника",
             description = "Для получения отправьте ID")
     public Optional<List<TaskResponse>> getEmployeeTaskResponsesByID(@PathVariable Long id) {
-
         return employeeService.getEmployeeTaskResponses(id);
     }
 

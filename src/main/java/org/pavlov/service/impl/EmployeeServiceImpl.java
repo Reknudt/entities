@@ -113,6 +113,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Employee findByIdOrThrow(Long id) {
         return employeeRepository.findById(id)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Resource not found"));
+                        () -> new ResourceNotFoundException("Employee " + id + " not found"));
     }
 }

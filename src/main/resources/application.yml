@@ -21,6 +21,14 @@ spring:
     show-sql: true
     open-in-view: true
 
+keycloak:
+  realm: spring-example
+  resource: entity-manipulation-client
+  auth-server-url: http://localhost:8080
+  credentials:
+    secret: W1ZuDtIY5AkAEFkCvKLApgYTX7HGLQrB
+#  use-resource-role-mappings: true
+
 logging:
   level:
     org:

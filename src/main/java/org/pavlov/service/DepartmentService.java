@@ -11,7 +11,7 @@ public interface DepartmentService {
 
     void updateDepartment(Long id, Department departmentRequest);
 
-    Optional<Department> getDepartment(Long id);
+    Department getDepartment(Long id);
 
     List<Department> getAllDepartments();
 

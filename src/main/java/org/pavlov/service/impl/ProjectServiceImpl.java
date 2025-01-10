@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -20,7 +19,6 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     @Override
     public void createProject(Project projectRequest) {
-
         projectRepository.save(projectRequest);
     }
 
@@ -37,11 +35,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Transactional
     @Override
-    public Optional<Project> getProject(Long id) {
-        return projectRepository.getOneWith(id);
-//        Project project = findByIdOrThrow(id);
-
-//        return Optional.ofNullable(project);
+    public Project getProject(Long id) {
+        return findByIdOrThrow(id);
     }
 
     @Transactional
@@ -60,6 +55,6 @@ public class ProjectServiceImpl implements ProjectService {
     private Project findByIdOrThrow(Long id) {
         return projectRepository.findById(id)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Resource not found"));
+                        () -> new ResourceNotFoundException("Project " + id + " not found"));
     }
 }
