@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 
+//@EnableMethodSecurity
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/departments")
@@ -30,6 +30,7 @@ public class DepartmentController {
 
     private final DepartmentService departmentService;
 
+//    @PreAuthorize("hasRole('read_guest_new')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(
@@ -40,6 +41,7 @@ public class DepartmentController {
         departmentService.createDepartment(departmentRequest);
     }
 
+//    @PreAuthorize("")
     @PutMapping("/{id}")
     @Operation(
             summary = "Обновление отдела",
@@ -50,6 +52,7 @@ public class DepartmentController {
         departmentService.updateDepartment(id, departmentRequest);
     }
 
+//    @PreAuthorize("hasRole('read_guest_new')")
     @GetMapping("/{id}")
     @Operation(
             summary = "Получение отдела по ID",

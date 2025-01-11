@@ -1,19 +1,40 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/entitiesdb
     username: pguser
     password: pgpass
-#  flyway.enabled: true
-#  flyway:
-#    locations: classpath:db.migrations
-#    schemas: file
-#    url: jdbc:postgresql://localhost:5432/countbytesdb
-#    user: pguser
-#    password: pgpass
-#    baselineOnMigrate: true
+  security:
+    user:
+      name: 1
+      password: 1
+    oauth2:
+      security:
+        client:
+          provider:
+            baeldung-keycloak:
+              issuer-uri: //localhost:8080/realms/spring-entity-client
+          registration:
+            keycloak:
+              provider: spring-entity-client
+              client-name: my-example-client
+              client-id: example-client
+              client-secret: W1ZuDtIY5AkAEFkCvKLApgYTX7HGLQrB
+              scope: openid,offline_access,profile
+
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          external:
+#            provider: spring-entity-client
+#            client-name: my-example-client
+#            client-id: example-client
+#            client-secret: W1ZuDtIY5AkAEFkCvKLApgYTX7HGLQrB
+#            scope: openid,offline_access,profile
+#            authorization-grant-type: authorization_code
   jpa:
     properties:
       hibernate:
@@ -21,13 +42,16 @@ spring:
     show-sql: true
     open-in-view: true
 
+
 keycloak:
-  realm: spring-example
-  resource: entity-manipulation-client
+  realm: spring-entity-client
+  resource: example-client
   auth-server-url: http://localhost:8080
+  use-resource-role-mappings: false
   credentials:
     secret: W1ZuDtIY5AkAEFkCvKLApgYTX7HGLQrB
-#  use-resource-role-mappings: true
+
+
 
 logging:
   level:
