@@ -9,6 +9,7 @@ import org.pavlov.model.Task;
 import org.pavlov.response.TaskResponse;
 import org.pavlov.service.EmployeeService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,12 +43,12 @@ public class EmployeeController {
     }
 
     @PutMapping("/{id}")
+//    @PreAuthorize("hasAuthority('user')")
     @Operation(
             summary = "Обновление сотрудника",
             description = "Обновление сущности в бд")
     public void updateEmployee(@PathVariable Long id,
                                @RequestBody @Valid Employee employeeRequest) {
-
         employeeService.updateEmployee(id, employeeRequest);
     }
 
@@ -68,8 +69,9 @@ public class EmployeeController {
     }
 
     @GetMapping("taskResponses/{id}")
+    @PreAuthorize("hasAuthority('user') and hasAuthority('editor')")
     @Operation(
-            summary = "Получение задания по ID сотрудника",
+            summary = "Получение только задания по ID сотрудника",
             description = "Для получения отправьте ID")
     public Optional<List<TaskResponse>> getEmployeeTaskResponsesByID(@PathVariable Long id) {
         return employeeService.getEmployeeTaskResponses(id);
@@ -95,6 +97,7 @@ public class EmployeeController {
 
 
     @GetMapping
+    @PreAuthorize("hasAuthority('user') and hasAuthority('visitor')")
     @Operation(
             summary = "Получение всех сотрудников")
     public List<Employee> getAllEmployees() {

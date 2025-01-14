@@ -1,19 +1,27 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/entitiesdb
     username: pguser
     password: pgpass
-#  flyway.enabled: true
-#  flyway:
-#    locations: classpath:db.migrations
-#    schemas: file
-#    url: jdbc:postgresql://localhost:5432/countbytesdb
-#    user: pguser
-#    password: pgpass
-#    baselineOnMigrate: true
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            user-name-attribute: preferred_username
+            issuer-uri: http://localhost:8080/realms/spring-entity-client
+        registration:
+          keycloak:
+            authorization-grant-type: password
+            client-id: example-client
+            client-secret: yK6uLTwpwbHQiEkMH3kA6toPLkZq1l16
+            scope: openid
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/spring-entity-client
   jpa:
     properties:
       hibernate:
@@ -21,13 +29,15 @@ spring:
     show-sql: true
     open-in-view: true
 
+baseUrl: http://localhost:8081/swagger-ui/index.html#/
+
 keycloak:
-  realm: spring-example
-  resource: entity-manipulation-client
+  realm: spring-entity-client
+  resource: example-client
   auth-server-url: http://localhost:8080
+  use-resource-role-mappings: false
   credentials:
-    secret: W1ZuDtIY5AkAEFkCvKLApgYTX7HGLQrB
-#  use-resource-role-mappings: true
+    secret: yK6uLTwpwbHQiEkMH3kA6toPLkZq1l16
 
 logging:
   level:
