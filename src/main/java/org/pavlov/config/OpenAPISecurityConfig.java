@@ -33,7 +33,7 @@ public class OpenAPISecurityConfig {
     }
 
     private SecurityScheme createOAuthScheme() {
-        OAuthFlows flows = createOAuthFlows();
+            OAuthFlows flows = createOAuthFlows();
         return new SecurityScheme().type(SecurityScheme.Type.OAUTH2)
                 .flows(flows);
     }
@@ -46,8 +46,8 @@ public class OpenAPISecurityConfig {
     private OAuthFlow createAuthorizationCodeFlow() {
         return new OAuthFlow()
                 .authorizationUrl(authServerUrl + "/realms/" + realm + "/protocol/openid-connect/auth")
-                .scopes(new Scopes().addString("read_access", "read data")
-                        .addString("write_access", "modify data"));
+                .tokenUrl(authServerUrl + "/realms/" + realm + "/protocol/openid-connect/token")
+                .scopes(new Scopes().addString("user_scope", "employee permissions and read data")
+                        .addString("admin_scope", "task permissions and modify data"));
     }
-
 }
