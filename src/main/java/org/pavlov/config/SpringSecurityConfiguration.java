@@ -3,7 +3,11 @@ package org.pavlov.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authorization.AuthorityAuthorizationManager;
+import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.authorization.AuthorizationManagers;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -19,6 +23,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Collection;
 import java.util.stream.Stream;
+
+import static org.springframework.security.authorization.AuthorityAuthorizationManager.hasAuthority;
 
 
 @Configuration
@@ -63,8 +69,11 @@ public class SpringSecurityConfiguration {
         }).csrf(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(requests -> {
-            requests.requestMatchers("/api/v1/employee/**").hasAnyAuthority("user", "admin");
-            requests.requestMatchers("/api/v1/tasks/**").hasAuthority("admin");     //
+//            requests.requestMatchers("/api/v1/employee/**").hasAnyAuthority("user", "admin");
+            requests.requestMatchers("/api/v1/tasks/**").hasAuthority("admin");
+            requests.requestMatchers("/api/v1/employees/**").hasAuthority("user");
+//            requests.requestMatchers("/api/v1/employees/**").access(AuthorizationManagers
+//                    .allOf(AuthorityAuthorizationManager.hasAuthority("user"), AuthorityAuthorizationManager.hasAuthority("admin")));
             requests.requestMatchers("/api/v1/**").authenticated();
             requests.anyRequest().permitAll();
         });
