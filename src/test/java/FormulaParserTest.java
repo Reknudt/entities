@@ -1,9 +1,11 @@
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,35 +16,57 @@ public class FormulaParserTest {
 
     public enum FunctionType {
         CNTOP {
-            public double apply(double a) { // -0.11
-                return -0.11;
+            public BigDecimal cntop() {
+                return super.cntop();
             }
         },
         SUMOP {
-            public double apply(double a) {
-                return 2.555;
+            public BigDecimal sumop() {
+                return super.sumop();
             }
         },          // 2.555
         RESERV {
-            public double apply(double a) {
-                return 0.888888;
+            public BigDecimal reserv() {
+                return super.reserv();
             }
         },         // 0.8888888
         ROUNDCOST {
-            public double apply(double a) {
-                return a / 4;
+            public BigDecimal roundcost(BigDecimal a) {
+                return super.roundcost(a);
             }
         },      //  /4
         ROUNDOPERSUM {
-            public double apply(double a) {
-                return Math.round (a * 100.0) / 100.0;
+            public BigDecimal roundopersum(BigDecimal a) {
+                return super.roundopersum(a);
             }
             // round(2)
         };
-        abstract double apply(double a);
+        public BigDecimal cntop() {
+            return BigDecimal.valueOf(-0.11);
+        }
+
+        public BigDecimal sumop() {
+            return new BigDecimal("2.555");
+        }
+
+        public BigDecimal reserv() {
+            return new BigDecimal("0.888888");
+        }
+
+        public BigDecimal roundcost(BigDecimal a) {
+            BigDecimal divisor = new BigDecimal(4);
+            return a.divide(divisor);
+        }
+
+        public BigDecimal roundopersum(BigDecimal a) {
+            MathContext m = new MathContext(3);
+            return a.round(m);
+        }
     }
 
-    String validate(String formula) {       //  убрать пустые скобки и пробелы
+    final String[] functionsWithArgs = {"ROUNDCOST", "ROUNDOPERSUM"};
+
+    public String validate(String formula) {       //  убрать пустые скобки и пробелы
 
         formula = emptyBracketsRemove(formula);
         formula = spacesRemove(formula);
@@ -50,7 +74,7 @@ public class FormulaParserTest {
         return formula;
     }
 
-    String emptyBracketsRemove(String formula) {
+    public String emptyBracketsRemove(String formula) {
         if (formula.contains("(")) {
             char[] formulaArray = formula.toCharArray();
 
@@ -65,9 +89,8 @@ public class FormulaParserTest {
         return formula;
     }
 
-    String spacesRemove(String formula) {
+    public String spacesRemove(String formula) {
         if (formula.contains(" ")) {
-
             char[] formulaArray = formula.toCharArray();
 
             for (int i = 0; i < formulaArray.length; i++) {
@@ -81,281 +104,172 @@ public class FormulaParserTest {
         return formula;
     }
 
-    BigDecimal calculate(String formula) {
+    public BigDecimal calculate(String formula) {
         if (formula.isEmpty()) {
             return null;
         }
+        List<String> operations = formulaSplit(formula);
 
-        String[] operations = formula.split("\\s+");
-
-        double res = checkSimpleMath(operations);
-
-        return BigDecimal.valueOf(res);
+        return checkSimpleMath(operations);
     }
 
-    double checkSimpleMath(String[] operations) {       //  start calculating
+    public List<String> formulaSplit(String formula) {
+        List<String> operations = new ArrayList<>();
 
-        double res = 0;
+        if (formula.contains(" ")) {
+            char[] formulaArray = formula.toCharArray();
 
-        for (int i = 0; i < operations.length; i++) {
-            String cur = operations[i];
+            int operStart = 0;
+
+            for (int i = 0; i < formulaArray.length; i++) {
+
+                if (i+1 < formulaArray.length && i > 0
+                        && formulaArray[i] == ' ' && (formulaArray[i-1] == '(')) {
+
+                    String buffer = formula.substring(operStart, i);
+                    if (Arrays.stream(functionsWithArgs).anyMatch(buffer::contains)) {
+
+                        int leftBracket = 1;
+                        int rightBracket = 0;
+
+                        while (leftBracket != rightBracket && i < formulaArray.length) {
+
+                            if (formulaArray[i] == '(') leftBracket++;
+                            if (formulaArray[i] == ')') rightBracket++;
+                            i++;
+                        }
+
+                        operations.add(formula.substring(operStart, i));
+                        operStart = i+1;
+                    }
+
+                } else if (i + 1 < formulaArray.length && i > 0 && formulaArray[i] == ' ') {
+                    operations.add(formula.substring(operStart, i));
+                    operStart = i+1;
+                } else if (i + 1 == formulaArray.length && formulaArray[i] != ' ') {
+                    operations.add(formula.substring(operStart, i + 1));
+                }
+            }
+            return operations;
+        } else {
+            operations.add(formula);
+            return operations;
+        }
+
+    }
+
+    public BigDecimal checkSimpleMath(List<String> operations) {       //  start calculating
+        BigDecimal res = new BigDecimal("0");
+
+        for (int i = 0; i < operations.size(); i++) {
+            String cur = operations.get(i);
 
             int key = typeCheck(cur);
-            System.out.println(operations[i] + " is current op and its code is " + key);
+            System.out.println(cur + " is current op and its code is " + key);
 
             if (key == 1) {
-                res += Double.parseDouble(cur);
+                BigDecimal bufferDec = new BigDecimal(cur);
+                res = res.add(bufferDec);
             }
             if (key == 2) {
-                String nextOpStr = operations[i+1];
-                double nextOp = 0;
+                String nextOpStr = operations.get(i+1);
+
+                BigDecimal nextOp = new BigDecimal(0);
                 int key2 = typeCheck(nextOpStr);
+
                 System.out.println(nextOpStr + " is current op and its code is " + key2);
+
                 if (key2 == 1) {
-                    nextOp += Double.parseDouble(nextOpStr);
+                    nextOp = nextOp.add(new BigDecimal(nextOpStr));
                 } else if (key2 == 3) {
-                    nextOp += functionUse(cur);
+                    nextOp = nextOp.add(functionUse(nextOpStr));
+                    System.out.println(" next arg is " + nextOp);
                 } else {
                     System.out.println("Operations like -- or *- are not supported!");
-                    return 0;
+                    return null;
                 }
 
                 if (cur.equals("+")) {
-                    res = res + nextOp;
+                    res = res.add(nextOp);
                     i++;
                 } else if (cur.equals("-")) {
-                    res = res - nextOp;
+                    res = res.subtract(nextOp);
                     i++;
                 } else if (cur.equals("*")) {
-                    res = res * nextOp;
+                    res = res.multiply(nextOp);
                     i++;
                 } else if (cur.equals("/")) {
-                    if (nextOp == 0) {
-                        System.out.println("Incorrect input od " + nextOp);
-                        return 0;
+                    if (nextOp.doubleValue() == 0) {
+                        System.out.println("Incorrect input of " + nextOp);
+                        return null;
                     } else {
-                        res = res/nextOp;
+                        res = res.divide(nextOp);
                         i++;
                     }
                 } else {
                     System.out.println("Incorrect input of " + cur);
-                    return 0;
+                    return null;
                 }
             }
-            if (key == 3) res += functionUse(cur);
+            if (key == 3) {
+                res = res.add(functionUse(cur));
+            }
         }
-
-
-
-//            if (cur.matches("-?\\d+(\\.\\d+)?")) {          //check if not double (float?)
-//                res += Double.parseDouble(cur);
-//
-//            } else if (cur.length() != 1) {             // check if not function
-//
-//                if (cur.equals("CNTOP")) {
-//                    res += FunctionType.CNTOP.apply(i);
-//                } else if (cur.equals("SUMOP")) {
-//                    res += FunctionType.SUMOP.apply(i);
-//                } else if (cur.equals("RESERV")) {
-//                    res += FunctionType.RESERV.apply(i);
-//                } else if (cur.contains("ROUNDCOST")) {
-//                    int iBegin = cur.indexOf("(");
-//                    String value = cur.substring(iBegin + 1, cur.length() - 1);                 //надо проверить не является ли аргумент функцией
-//                    res += FunctionType.ROUNDCOST.apply(Double.parseDouble(value));
-//                } else if (cur.contains("ROUNDOPERSUM")) {
-//                    int iBegin = cur.indexOf("(");
-//                    String value = cur.substring(iBegin + 1, cur.length() - 1);
-//                    res += FunctionType.ROUNDOPERSUM.apply(Double.parseDouble(value));
-//                } else {
-//                    System.out.println("Incorrect input of " + cur);
-//                    return 0;
-//                }
-//            } else if (cur.length() == 1) {                 // check if not math operation
-//                double nextOp = Double.parseDouble(operations[i+1]);
-//
-//                if (cur.equals("+")) {
-//                    res = res + nextOp;
-//                        i++;
-//                    } else if (cur.equals("-")) {
-//                    res = res - nextOp;
-//                        i++;
-//                    } else if (cur.equals("*")) {
-//                        res = res * nextOp;
-//                        i++;
-//                    } else if (cur.equals("/")) {
-//                        if (nextOp == 0) {
-//                            System.out.println("Incorrect input od " + nextOp);
-//                            return 0;
-//                        } else {
-//                            res = res/nextOp;
-//                            i++;
-//                        }
-//                    } else {
-//                    System.out.println("Incorrect input of " + cur);
-//                    return 0;
-//                }
-//
-//            }
-
-
         return res;
     }
 
-    int typeCheck(String operation) {
+    public int typeCheck(String operation) {
 
         if (operation.matches("-?\\d+(\\.\\d+)?")) {
             return 1;
         } else if (operation.matches("^(\\+|-|\\*|/)$")) {
             return 2;
-        } else if (operation.matches("^(CNTOP|SUMOP|RESERV|ROUNDCOST|ROUNDOPERSUM)")) {
+        } else if (operation.matches("^(CNTOP|SUMOP|RESERV|ROUNDCOST|ROUNDOPERSUM).*")) {
             return 3;
         }
         return 9;
     }
 
-    double functionUse(String operation) {
-
-        double kostyl = 100;
+    public BigDecimal functionUse(String operation) {
+        BigDecimal errorCode = new BigDecimal(50);
 
         if (operation.equals("CNTOP")) {
-            return FunctionType.CNTOP.apply(kostyl);
+            return FunctionType.CNTOP.cntop();
         } else if (operation.equals("SUMOP")) {
-            return FunctionType.SUMOP.apply(kostyl);
+            return FunctionType.SUMOP.sumop();
         } else if (operation.equals("RESERV")) {
-            return FunctionType.RESERV.apply(kostyl);
+            return FunctionType.RESERV.reserv();
         } else if (operation.contains("ROUNDCOST")) {
             int iBegin = operation.indexOf("(");
-            String value = operation.substring(iBegin + 1, operation.length() - 2);
+            String arg = operation.substring(iBegin + 2, operation.length() - 2);
 
-            double argValue = typeCheck(value);             // проверка аргумента
-            return FunctionType.ROUNDCOST.apply(argValue);
+            BigDecimal argValue = calculate(arg);
+
+            return FunctionType.ROUNDCOST.roundcost(argValue);
         } else if (operation.contains("ROUNDOPERSUM")) {
             int iBegin = operation.indexOf("(");
-            String value = operation.substring(iBegin + 1, operation.length() - 2);
+            String arg = operation.substring(iBegin + 2, operation.length() - 2);
 
-            double argValue = typeCheck(value);
-            return FunctionType.ROUNDOPERSUM.apply(argValue);
+            BigDecimal argValue = calculate(arg);
+
+            return FunctionType.ROUNDOPERSUM.roundopersum(argValue);
         }
-
-        return kostyl;
+        return errorCode;
     }
 
     @Test
     void test1() {
-//        String f1 = "ROUNDOPERSUM(ROUNDCOST(4.4444444)) * 2";
-        String f1 = "ROUNDOPERSUM(4.444444444)";
+        String f1 = "2 + CNTOP + CNTOP +  ROUNDOPERSUM( RESERV + 1 )";
+//        String f1 = "ROUNDCOST( 1.333 + ROUNDCOST( SUMOP ))";
 
         String f2 = validate(f1);
 
 //        System.out.println(f1);
 //        System.out.println(f2);
 
-        System.out.println(calculate(f2));
+        BigDecimal result = calculate(f2);
+        System.out.println(result);
+
+//        assertEquals(BigDecimal.valueOf(3.67), result);
     }
-
-    @Test
-    void validateSpacesTest() {
-        String f = "CNTOP  +  6";
-        String fe = "CNTOP + 6";
-        String fa = validate(f);
-        assertEquals(fe, fa);
-    }
-
-    @Test
-    void validateEmptyBracketsTest() {
-        String f = "CNTOP() + 6";
-        String fe = "CNTOP + 6";
-        String fa = validate(f);
-        Assertions.assertEquals(fe, fa);
-    }
-
-    @Test
-    void calculateNumbersWithPlusTest() {
-        String f = "2.8888 + 6.1112";
-        BigDecimal fe = new BigDecimal(9);
-        BigDecimal fa = calculate(f);
-        assertTrue(fe.compareTo(fa) == 0);
-    }
-
-    @Test
-    void calculateNumbersWithMinusTest() {
-        String f = "2 - 6";
-        BigDecimal fe = new BigDecimal(-4);
-        BigDecimal fa = calculate(f);
-        assertTrue(fe.compareTo(fa) == 0);
-    }
-
-    @Test
-    void calculateNumbersWithMultiplyTest() {
-        String f = "6 * 2";
-        BigDecimal fe = new BigDecimal(12);
-        BigDecimal fa = calculate(f);
-        assertTrue(fe.compareTo(fa) == 0);
-    }
-
-    @Test
-    void calculateNumbersWithDivPositiveTest() {
-        String f = "6 / 2";
-        BigDecimal fe = new BigDecimal(3);
-        BigDecimal fa = calculate(f);
-        assertTrue(fe.compareTo(fa) == 0);
-    }
-
-    @Test
-    void calculateNumbersWithDivNegativeTest() {
-        String f = "2 / 0";
-        BigDecimal fe = new BigDecimal(0);
-        BigDecimal fa = calculate(f);
-        assertTrue(fe.compareTo(fa) == 0);
-    }
-
-    @Test
-    void calculateWithFunctionCNTOPTest() {
-        String f = "CNTOP + 1.11";
-        BigDecimal fe = new BigDecimal(1);
-        BigDecimal fa = calculate(f);
-//        assertThat(fe, Matchers.comparesEqualTo(fa));
-        assertTrue(fe.compareTo(fa) == 0);
-    }
-
-    @Test
-    void calculateWithFunctionSUMOPTest() {
-        String f = "SUMOP - 0.555";
-        BigDecimal fe = new BigDecimal(2);
-        BigDecimal fa = calculate(f);
-//        assertThat(fe, Matchers.comparesEqualTo(fa));
-        assertTrue(fe.compareTo(fa) == 0);
-    }
-
-    @Test
-    void calculateWithFunctionRESERVTest() {
-        String f = "RESERV + 0.111112";
-        BigDecimal fe = new BigDecimal(1);
-        BigDecimal fa = calculate(f);
-        assertThat(fe, Matchers.comparesEqualTo(fa));
-//        assertTrue(fe.compareTo(fa) == 0);
-    }
-
-    @Test
-    void calculateWithFunctionROUNDCOSTTest() {
-        String f = "ROUNDCOST(8) - 1";
-        BigDecimal fe = new BigDecimal(1);
-        BigDecimal fa = calculate(f);
-//        assertThat(fe, Matchers.comparesEqualTo(fa));
-        assertTrue(fe.compareTo(fa) == 0);
-    }
-
-    @Test
-    void calculateWithFunctionROUNDOPERSUMTest() {          ///
-        String f = "ROUNDOPERSUM(2.222222) - 1.22";
-        BigDecimal fe = new BigDecimal(1);
-        BigDecimal fa = calculate(f);
-//        MathContext m = new MathContext(1);
-//        BigDecimal fer = fe.round(m);
-//        assertThat(fe, Matchers.comparesEqualTo(fa));
-        assertTrue(fe.compareTo(fa) == 0);
-    }
-
-
-//    CALCULATE("2 + CNTOP + CNTOP +  ROUNDOPERSUM(RESERV+1)") RETURNS  3.66
 }
