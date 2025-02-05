@@ -13,8 +13,13 @@ public interface EmployeeService {
 
     void updateEmployee(Long id, Employee employeeRequest);
 
-//    void updateTaskList(Long id, List<Long> taskIds);
+    void updateTasksById(Long id, List<Long> taskIds);
+
     void updateTaskList(Long id, List<Task> tasks);
+
+    void assignTask(Long id, Long taskId);
+
+    void removeTask(Long id, Long taskId);
 
     Employee getEmployee(Long id);
 

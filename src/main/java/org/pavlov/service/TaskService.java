@@ -17,9 +17,7 @@ public interface TaskService {
 
     void deleteTask(Long id);
 
-    void addEmployee(Long id, Long employeeId);
+//    void addEmployee(Long id, Long employeeId);
 
-    void removeEmployee(Long id, Long employeeId);
-
-    Task findByIdOrThrow(Long id);
+//    void removeEmployee(Long id, Long employeeId);
 }

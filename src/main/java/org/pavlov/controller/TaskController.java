@@ -63,32 +63,6 @@ public class TaskController {
         taskService.updateTask(id, taskRequest);
     }
 
-    @PutMapping("addEmployee/{id}")
-    @Operation(
-            summary = "Assign employee for task",
-            description = "Send task id as path variable and employee's id " +
-                    "as a parametr to assign new employee for task")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Task updated",
-                    content = @Content),
-            @ApiResponse(responseCode = "400", description = "Invalid form filling",
-                    content = @Content)})
-    public void addTaskEmployee(@PathVariable Long id, @RequestParam @Valid Long employeeId) {
-        taskService.addEmployee(id, employeeId);
-    }
-
-    @PutMapping("removeEmployee/{id}")                      //
-    @Operation(
-            summary = "Remove employee from task",
-            description = "Send task's id and employee's id to remove employee from task")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Task updated",
-                    content = @Content),
-            @ApiResponse(responseCode = "400", description = "Invalid form filling",
-                    content = @Content)})
-    public void removeTaskEmployee(@PathVariable Long id, @RequestParam @Valid Long employeeId) {
-        taskService.removeEmployee(id, employeeId);
-    }
 
     @GetMapping("/{id}")
 //    @PreAuthorize("hasAuthority('admin')")

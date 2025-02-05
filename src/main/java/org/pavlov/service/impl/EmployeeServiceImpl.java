@@ -20,6 +20,7 @@ import java.util.Optional;
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final TaskServiceImpl taskService;
 
     @Transactional
     @Override
@@ -48,20 +49,20 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeRepository.save(employee);
     }
 
-//    @Transactional
-//    @Override
-//    public void updateTaskList(Long id, List<Long> taskIds) {
-//        Employee employee = findByIdOrThrow(id);
-//        List<Task> newTasks = List.of();
-//
-//        for (Long taskId : taskIds) {
-//            Task task = taskService.findByIdOrThrow(taskId);
-//            newTasks.add(task);
-//        }
-//
-//        employee.setTasks(newTasks);
-//        employeeRepository.save(employee);
-//    }
+    @Transactional
+    @Override
+    public void updateTasksById(Long id, List<Long> taskIds) {
+        Employee employee = findByIdOrThrow(id);
+        List<Task> newTasks = new ArrayList<>(List.of());
+
+        for (Long taskId : taskIds) {
+            Task task = taskService.findByIdOrThrow(taskId);
+            newTasks.add(task);
+        }
+
+        employee.setTasks(newTasks);
+        employeeRepository.save(employee);
+    }
 
     @Transactional
     @Override
@@ -131,6 +132,30 @@ public class EmployeeServiceImpl implements EmployeeService {
             newList.addAll(newBossesEmployee);
         }
         return newList;
+    }
+
+    @Transactional
+    @Override
+    public void assignTask(Long id, Long taskId) {
+        Employee employee = findByIdOrThrow(id);
+        Task newTask = taskService.findByIdOrThrow(taskId);
+
+        List<Task> taskList = employee.getTasks();
+        taskList.add(newTask);
+        employee.setTasks(taskList);
+        employeeRepository.save(employee);
+    }
+
+    @Transactional
+    @Override
+    public void removeTask(Long id, Long taskId) {
+        Employee employee = findByIdOrThrow(id);
+        Task newTask = taskService.findByIdOrThrow(taskId);
+
+        List<Task> taskList = employee.getTasks();
+        taskList.remove(newTask);
+        employee.setTasks(taskList);
+        employeeRepository.save(employee);
     }
 
     public Employee findByIdOrThrow(Long id) {
