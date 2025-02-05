@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
@@ -35,7 +37,14 @@ public class Employee implements Serializable {
 //    @Column(name = "department_id")
     private Long departmentId;
 
-    @JsonIgnore
-    @ManyToMany(mappedBy = "employees")
+//    @JsonIgnore
+//    @ManyToMany(mappedBy = "employees")
+//    private List<Task> tasks;
+
+    @ManyToMany
+    @JoinTable(
+            name = "task_empl",
+            joinColumns = @JoinColumn(name = "employee_id"),
+            inverseJoinColumns = @JoinColumn(name = "task_id"))
     private List<Task> tasks;
 }

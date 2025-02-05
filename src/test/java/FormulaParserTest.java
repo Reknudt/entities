@@ -1,4 +1,3 @@
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -6,11 +5,6 @@ import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 
 public class FormulaParserTest {
 
@@ -41,8 +35,9 @@ public class FormulaParserTest {
             }
             // round(2)
         };
+
         public BigDecimal cntop() {
-            return BigDecimal.valueOf(-0.11);
+            return new BigDecimal("-0.11");
         }
 
         public BigDecimal sumop() {
@@ -64,47 +59,63 @@ public class FormulaParserTest {
         }
     }
 
-    final String[] functionsWithArgs = {"ROUNDCOST", "ROUNDOPERSUM"};
+    static final String[] functionsWithArgs = {"ROUNDCOST", "ROUNDOPERSUM"};
 
-    public String validate(String formula) {       //  убрать пустые скобки и пробелы
+    public static String validate(String formula) {       //  empty brackets, double spaces, all to upper case, spaces between
 
-        formula = emptyBracketsRemove(formula);
-        formula = spacesRemove(formula);
+        formula = formula.replace("  ", " ");
+        formula = formula.toUpperCase();
+        formula = formula.replace("()", "");
+//        formula = bracketSpaces(formula);
 
         return formula;
     }
 
-    public String emptyBracketsRemove(String formula) {
-        if (formula.contains("(")) {
-            char[] formulaArray = formula.toCharArray();
+//    public static String bracketSpaces(String formula) {
+//        char[] formulaArray = formula.toCharArray();
+//
+//        for (int i = 0; i < formulaArray.length; i++) {
+//            if (formulaArray[i] == '(' && i+1 != formulaArray.length && formulaArray[i+1] != ' ') {
+//                formula = formula.substring(0, i) + " " + formula.substring(i);
+//                System.out.println("new formula: " + formula);
+//                return bracketSpaces(formula);
+//            }
+////            if (formulaArray[i] == ')' && i-1 > 0 && formulaArray[i-1] != ' ') {
+////                formula = formula.substring(0, i) + " " + formula.substring(i);
+////                return bracketSpaces(formula);
+////            }
+//        }
+//        return formula;
+//    }
 
-            for (int i = 0; i < formulaArray.length; i++) {
-                if (i+1 < formulaArray.length && formulaArray[i] == '(' && formulaArray[i+1] == ')') {
-                    String newFormula = formula.substring(0, i) + formula.substring(i+2);
+//    public static String bracketSpaces(String formula) {
+//        if ((formula.contains("(") || formula.contains(")"))
+//                && !(formula.contains("( ") && formula.contains(" )"))) {
+//            char[] formulaArray = formula.toCharArray();
+//
+//            int obIndex = formula.indexOf("(");
+//            if (obIndex + 1 != formula.length() && formulaArray[obIndex + 1] != ' ') {
+//                formula = formula.substring(0, obIndex + 1) + " " + formula.substring(obIndex + 1);
+//                return bracketSpaces(formula);
+//            }
+//            int cbIndex = formula.indexOf(")");
+//            if (cbIndex > 0 && formulaArray[cbIndex - 1] != ' ') {
+//                formula = formula.substring(0, cbIndex) + " " + formula.substring(cbIndex);
+//                return bracketSpaces(formula);
+//            }
+//        }
+//        return formula;
+//    }
 
-                    return emptyBracketsRemove(newFormula);
-                }
-            }
-        }
-        return formula;
-    }
+//    public static String operationSpaces(String formula) {
+//        if (formula.matches(".*(\\+|-|\\*|/).*")) {
+//            char[] formulaArray = formula.toCharArray();
+//
+//        }
+//        return formula;
+//    }
 
-    public String spacesRemove(String formula) {
-        if (formula.contains(" ")) {
-            char[] formulaArray = formula.toCharArray();
-
-            for (int i = 0; i < formulaArray.length; i++) {
-                if (i+1 < formulaArray.length && formulaArray[i] == ' ' && formulaArray[i+1] == ' ') {
-                    String newFormula = formula.substring(0, i) + formula.substring(i+1);
-
-                    return spacesRemove(newFormula);
-                }
-            }
-        }
-        return formula;
-    }
-
-    public BigDecimal calculate(String formula) {
+    public static BigDecimal calculate(String formula) {
         if (formula.isEmpty()) {
             return null;
         }
@@ -113,7 +124,7 @@ public class FormulaParserTest {
         return checkSimpleMath(operations);
     }
 
-    public List<String> formulaSplit(String formula) {
+    public static List<String> formulaSplit(String formula) {
         List<String> operations = new ArrayList<>();
 
         if (formula.contains(" ")) {
@@ -121,7 +132,7 @@ public class FormulaParserTest {
 
             int operStart = 0;
 
-            for (int i = 0; i < formulaArray.length; i++) {
+            for (int i = 0; i < formulaArray.length; i++) {     //delimit for func with multiple args
 
                 if (i+1 < formulaArray.length && i > 0
                         && formulaArray[i] == ' ' && (formulaArray[i-1] == '(')) {
@@ -145,7 +156,7 @@ public class FormulaParserTest {
 
                 } else if (i + 1 < formulaArray.length && i > 0 && formulaArray[i] == ' ') {
                     operations.add(formula.substring(operStart, i));
-                    operStart = i+1;
+                    operStart = i + 1;
                 } else if (i + 1 == formulaArray.length && formulaArray[i] != ' ') {
                     operations.add(formula.substring(operStart, i + 1));
                 }
@@ -155,17 +166,15 @@ public class FormulaParserTest {
             operations.add(formula);
             return operations;
         }
-
     }
 
-    public BigDecimal checkSimpleMath(List<String> operations) {       //  start calculating
+    public static BigDecimal checkSimpleMath(List<String> operations) {//  start calculating
         BigDecimal res = new BigDecimal("0");
 
         for (int i = 0; i < operations.size(); i++) {
             String cur = operations.get(i);
 
             int key = typeCheck(cur);
-            System.out.println(cur + " is current op and its code is " + key);
 
             if (key == 1) {
                 BigDecimal bufferDec = new BigDecimal(cur);
@@ -177,15 +186,12 @@ public class FormulaParserTest {
                 BigDecimal nextOp = new BigDecimal(0);
                 int key2 = typeCheck(nextOpStr);
 
-                System.out.println(nextOpStr + " is current op and its code is " + key2);
-
                 if (key2 == 1) {
                     nextOp = nextOp.add(new BigDecimal(nextOpStr));
                 } else if (key2 == 3) {
                     nextOp = nextOp.add(functionUse(nextOpStr));
-                    System.out.println(" next arg is " + nextOp);
                 } else {
-                    System.out.println("Operations like -- or *- are not supported!");
+                    System.out.println("Operations like -- or +- are not supported!");
                     return null;
                 }
 
@@ -218,7 +224,7 @@ public class FormulaParserTest {
         return res;
     }
 
-    public int typeCheck(String operation) {
+    public static int typeCheck(String operation) {
 
         if (operation.matches("-?\\d+(\\.\\d+)?")) {
             return 1;
@@ -226,50 +232,52 @@ public class FormulaParserTest {
             return 2;
         } else if (operation.matches("^(CNTOP|SUMOP|RESERV|ROUNDCOST|ROUNDOPERSUM).*")) {
             return 3;
+        } else {
+            System.out.println("Cant't match operation type: " + operation);
         }
-        return 9;
+        return 900;
     }
 
-    public BigDecimal functionUse(String operation) {
-        BigDecimal errorCode = new BigDecimal(50);
+    public static BigDecimal functionUse(String operation) {
+        BigDecimal errorCode = new BigDecimal(5000);
 
         if (operation.equals("CNTOP")) {
             return FunctionType.CNTOP.cntop();
+
         } else if (operation.equals("SUMOP")) {
             return FunctionType.SUMOP.sumop();
+
         } else if (operation.equals("RESERV")) {
             return FunctionType.RESERV.reserv();
-        } else if (operation.contains("ROUNDCOST")) {
+
+        } else if (operation.matches("^ROUNDCOST\\(.*.\\)")) {
             int iBegin = operation.indexOf("(");
             String arg = operation.substring(iBegin + 2, operation.length() - 2);
-
             BigDecimal argValue = calculate(arg);
-
             return FunctionType.ROUNDCOST.roundcost(argValue);
-        } else if (operation.contains("ROUNDOPERSUM")) {
+
+        } else if (operation.matches("^ROUNDOPERSUM\\(.*.\\)")) {
             int iBegin = operation.indexOf("(");
             String arg = operation.substring(iBegin + 2, operation.length() - 2);
-
             BigDecimal argValue = calculate(arg);
-
             return FunctionType.ROUNDOPERSUM.roundopersum(argValue);
+
+        } else {
+            System.out.println("Invalid function entered or no brackets found: " + operation);
         }
         return errorCode;
     }
 
     @Test
     void test1() {
-        String f1 = "2 + CNTOP + CNTOP +  ROUNDOPERSUM( RESERV + 1 )";
-//        String f1 = "ROUNDCOST( 1.333 + ROUNDCOST( SUMOP ))";
+        String f1 = "2 + CNTOP + CNTOP +  ROUNDOPERSUM( RESERV + 1) - roundcost(234 - 3.234234)";
 
         String f2 = validate(f1);
 
-//        System.out.println(f1);
-//        System.out.println(f2);
+        System.out.println(f1);
+        System.out.println(f2);
 
         BigDecimal result = calculate(f2);
         System.out.println(result);
-
-//        assertEquals(BigDecimal.valueOf(3.67), result);
     }
 }

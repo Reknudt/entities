@@ -91,7 +91,7 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('admin')")
+//    @PreAuthorize("hasAuthority('admin')")
     @Operation(
             summary = "Get task by ID",
             description = "Send ID as a path variable to get information about this task")

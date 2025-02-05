@@ -1,26 +1,37 @@
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-
 import java.math.BigDecimal;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ParserTestCases {
+public class ParserCasesTest {
 
-    private FormulaParserTest formulaParserTest;
+    public FormulaParserTest formulaParserTest;
 
     @ParameterizedTest
-    @ValueSource(strings = {"CNTOP() + 2.345", "2.2344  -  RESERV"})
+    @ValueSource(strings = {"CNTOP() + 2.34234", "32.121212  +  CNTOP"})
     void validateTest(String formula) {
-        String vf = formulaParserTest.validate(formula);
+//        String formula = "CNTOP() + 2.345";
+        String vf = FormulaParserTest.validate(formula);
 
         System.out.println(vf);
     }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 2, 4 })
+    void checkEvenNumber(int number) {
+        assertEquals(0, number % 2,
+                "Supplied number is not an even number");
+    }
+
+//    @Test
+//    void calculateTest() {
+//        String formula = "2.22 + CNTOP";
+//        BigDecimal fr = FormulaParserTest.calculate(formula);
+//        assertEquals(BigDecimal.valueOf(2.11), fr);
+//    }
+
 
 //
 //

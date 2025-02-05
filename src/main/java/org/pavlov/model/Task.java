@@ -1,5 +1,6 @@
 package org.pavlov.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,10 +29,15 @@ public class Task implements Serializable {
     @NotBlank
     private String name;
 
-    @ManyToMany
-    @JoinTable(
-            name = "task_empl",
-            joinColumns = @JoinColumn(name = "task_id"),
-            inverseJoinColumns = @JoinColumn(name = "employee_id"))
+//    @ManyToMany
+//    @JoinTable(
+//            name = "task_empl",
+//            joinColumns = @JoinColumn(name = "task_id"),
+//            inverseJoinColumns = @JoinColumn(name = "employee_id"))
+//    private List<Employee> employees;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "tasks")
     private List<Employee> employees;
+
 }
