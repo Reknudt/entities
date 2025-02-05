@@ -24,22 +24,15 @@ public class Employee implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "id", unique = true, nullable = false)
     private Long id;
 
     @NotBlank
-//    @Column(name = "name")
     private String name;
 
-//    @Column(name = "boss_id")
     private Long bossId;
 
-//    @Column(name = "department_id")
     private Long departmentId;
 
-//    @JsonIgnore
-//    @ManyToMany(mappedBy = "employees")
-//    private List<Task> tasks;
 
     @ManyToMany
     @JoinTable(

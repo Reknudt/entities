@@ -29,13 +29,6 @@ public class Task implements Serializable {
     @NotBlank
     private String name;
 
-//    @ManyToMany
-//    @JoinTable(
-//            name = "task_empl",
-//            joinColumns = @JoinColumn(name = "task_id"),
-//            inverseJoinColumns = @JoinColumn(name = "employee_id"))
-//    private List<Employee> employees;
-
     @JsonIgnore
     @ManyToMany(mappedBy = "tasks")
     private List<Employee> employees;

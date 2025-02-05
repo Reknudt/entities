@@ -53,6 +53,15 @@ public class EmployeeController {
         employeeService.updateEmployee(id, employeeRequest);
     }
 
+    @PutMapping("tasks/{id}")
+    @Operation(
+            summary = "Обновление списка задач сотрудника",
+            description = "Добавления нового списка задач сотрудника в бд вместо старого списка")
+    public void updateTasksEmployee(@PathVariable Long id,
+                               @RequestBody List<Task> tasks) {
+        employeeService.updateTaskList(id, tasks);
+    }
+
     @GetMapping("/{id}")
     @Operation(
             summary = "Получение сотрудника по ID",

@@ -13,6 +13,9 @@ public interface EmployeeService {
 
     void updateEmployee(Long id, Employee employeeRequest);
 
+//    void updateTaskList(Long id, List<Long> taskIds);
+    void updateTaskList(Long id, List<Task> tasks);
+
     Employee getEmployee(Long id);
 
     List<Employee> getAllEmployees();

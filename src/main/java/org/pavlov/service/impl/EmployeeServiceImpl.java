@@ -7,6 +7,7 @@ import org.pavlov.model.Task;
 import org.pavlov.repository.EmployeeRepository;
 import org.pavlov.response.TaskResponse;
 import org.pavlov.service.EmployeeService;
+import org.pavlov.service.TaskService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,9 +35,33 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setName(employeeRequest.getName());
         employee.setBossId(employeeRequest.getBossId());
         employee.setDepartmentId(employeeRequest.getDepartmentId());
+        employee.setTasks(employeeRequest.getTasks());
 
         employeeRepository.save(employee);
     }
+
+    @Transactional
+    @Override
+    public void updateTaskList(Long id, List<Task> tasks) {
+        Employee employee = findByIdOrThrow(id);
+        employee.setTasks(tasks);
+        employeeRepository.save(employee);
+    }
+
+//    @Transactional
+//    @Override
+//    public void updateTaskList(Long id, List<Long> taskIds) {
+//        Employee employee = findByIdOrThrow(id);
+//        List<Task> newTasks = List.of();
+//
+//        for (Long taskId : taskIds) {
+//            Task task = taskService.findByIdOrThrow(taskId);
+//            newTasks.add(task);
+//        }
+//
+//        employee.setTasks(newTasks);
+//        employeeRepository.save(employee);
+//    }
 
     @Transactional
     @Override
@@ -77,7 +102,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         return Optional.ofNullable(tasks);
     }
 
-
     @Transactional
     @Override
     public List<Long> getAllByBossAlt(Long bossId) {
@@ -108,7 +132,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         return newList;
     }
-
 
     public Employee findByIdOrThrow(Long id) {
         return employeeRepository.findById(id)

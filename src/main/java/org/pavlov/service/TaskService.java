@@ -20,4 +20,6 @@ public interface TaskService {
     void addEmployee(Long id, Long employeeId);
 
     void removeEmployee(Long id, Long employeeId);
+
+    Task findByIdOrThrow(Long id);
 }
