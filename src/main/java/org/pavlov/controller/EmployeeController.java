@@ -105,11 +105,11 @@ public class EmployeeController {
                     content = @Content),
             @ApiResponse(responseCode = "400", description = "Invalid form filling",
                     content = @Content)})
-    public void assignTask(@PathVariable Long id, @RequestParam @Valid Long employeeId) {
-        employeeService.assignTask(id, employeeId);
+    public void assignTask(@PathVariable Long id, @RequestParam @Valid Long taskId) {
+        employeeService.assignTask(id, taskId);
     }
 
-    @PutMapping("removeTask/{id}")                      //
+    @PutMapping("removeTask/{id}")
     @Operation(
             summary = "Remove task from employee",
             description = "Send employee's id and task's id to remove task from employee")
@@ -118,8 +118,8 @@ public class EmployeeController {
                     content = @Content),
             @ApiResponse(responseCode = "400", description = "Invalid form filling",
                     content = @Content)})
-    public void removeTask(@PathVariable Long id, @RequestParam @Valid Long employeeId) {
-        employeeService.removeTask(id, employeeId);
+    public void removeTask(@PathVariable Long id, @RequestParam @Valid Long taskId) {
+        employeeService.removeTask(id, taskId);
     }
 
     @GetMapping("/{id}")

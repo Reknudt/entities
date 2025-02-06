@@ -35,6 +35,7 @@ public class TaskController {
 
     private final TaskService taskService;
 
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(
@@ -48,6 +49,7 @@ public class TaskController {
     public void createTask(@RequestBody @Valid Task taskRequest) {
         taskService.createTask(taskRequest);
     }
+
 
     @PutMapping("/{id}")
     @Operation(
@@ -76,6 +78,7 @@ public class TaskController {
         return taskService.getTask(id);
     }
 
+
     @GetMapping
     @Operation(
             summary = "Get all tasks",
@@ -86,6 +89,7 @@ public class TaskController {
     public List<Task> getAllTasks() {
         return taskService.getAllTasks();
     }
+
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
