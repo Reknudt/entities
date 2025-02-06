@@ -1,6 +1,9 @@
 package org.pavlov.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -9,6 +12,7 @@ import org.pavlov.model.Task;
 import org.pavlov.response.TaskResponse;
 import org.pavlov.service.EmployeeService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,6 +43,11 @@ public class EmployeeController {
     @Operation(
             summary = "Добавление сотрудника",
             description = "Сохранение сущности в бд")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Task created",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid form filling",
+                    content = @Content)})
     public void createEmployee(@RequestBody @Valid Employee employeeRequest) {
         employeeService.createEmployee(employeeRequest);
     }
@@ -47,9 +57,69 @@ public class EmployeeController {
     @Operation(
             summary = "Обновление сотрудника",
             description = "Обновление сущности в бд")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Employee updated",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid form filling",
+                    content = @Content)})
     public void updateEmployee(@PathVariable Long id,
                                @RequestBody @Valid Employee employeeRequest) {
         employeeService.updateEmployee(id, employeeRequest);
+    }
+
+    @PutMapping("tasks/{id}")
+    @Operation(
+            summary = "Обновление списка задач сотрудника",
+            description = "Добавления нового списка задач сотрудника в бд вместо старого списка")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Employee updated",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid form filling",
+                    content = @Content)})
+    public void updateTasksEmployee(@PathVariable Long id,
+                               @RequestBody List<Task> tasks) {
+        employeeService.updateTaskList(id, tasks);
+    }
+
+    @PutMapping("tasksById/{id}")
+    @Operation(
+            summary = "Обновление списка задач сотрудника",
+            description = "Добавления нового списка задач сотрудника в бд вместо старого списка")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Employee updated",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid form filling",
+                    content = @Content)})
+    public void updateTasksByIdEmployee(@PathVariable Long id,
+                                    @RequestBody List<Long> taskIds) {
+        employeeService.updateTasksById(id, taskIds);
+    }
+
+    @PutMapping("assignTask/{id}")
+    @Operation(
+            summary = "Assign task to employee",
+            description = "Send task id as path variable and employee's id " +
+                    "as a parametr to assign new task to employee")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Employee updated",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid form filling",
+                    content = @Content)})
+    public void assignTask(@PathVariable Long id, @RequestParam @Valid Long taskId) {
+        employeeService.assignTask(id, taskId);
+    }
+
+    @PutMapping("removeTask/{id}")
+    @Operation(
+            summary = "Remove task from employee",
+            description = "Send employee's id and task's id to remove task from employee")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Employee updated",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid form filling",
+                    content = @Content)})
+    public void removeTask(@PathVariable Long id, @RequestParam @Valid Long taskId) {
+        employeeService.removeTask(id, taskId);
     }
 
     @GetMapping("/{id}")
@@ -64,15 +134,21 @@ public class EmployeeController {
     @Operation(
             summary = "Получение задания по ID сотрудника",
             description = "Для получения отправьте ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Request succeed",
+                    content = @Content)})
     public Optional<List<Task>> getEmployeeTasksByID(@PathVariable Long id) {
         return employeeService.getEmployeeTasks(id);
     }
 
     @GetMapping("taskResponses/{id}")
-    @PreAuthorize("hasAuthority('user') and hasAuthority('editor')")
+//    @PreAuthorize("hasAuthority('user') and hasAuthority('editor')")
     @Operation(
             summary = "Получение только задания по ID сотрудника",
             description = "Для получения отправьте ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Request succeed",
+                    content = @Content)})
     public Optional<List<TaskResponse>> getEmployeeTaskResponsesByID(@PathVariable Long id) {
         return employeeService.getEmployeeTaskResponses(id);
     }
@@ -81,6 +157,9 @@ public class EmployeeController {
     @Operation(
             summary = "Получение сотрудника по boss ID",
             description = "Для получения отправьте boss ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Request succeed",
+                    content = @Content)})
     public List<Employee> getByBossID(@PathVariable Long id) {
 
         return employeeService.getAllByBoss(id);
@@ -90,6 +169,9 @@ public class EmployeeController {
     @Operation(
             summary = "Получение сотрудника по boss ID recursive",
             description = "Для получения отправьте boss ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Request succeed",
+                    content = @Content)})
     public List<Long> getByBossIDAlt(@PathVariable Long id) {
 
         return employeeService.getAllByBossAlt(id);
@@ -97,9 +179,12 @@ public class EmployeeController {
 
 
     @GetMapping
-    @PreAuthorize("hasAuthority('user') and hasAuthority('visitor')")
+//    @PreAuthorize("hasAuthority('user') and hasAuthority('visitor')")
     @Operation(
             summary = "Получение всех сотрудников")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Request succeed",
+                    content = @Content)})
     public List<Employee> getAllEmployees() {
 
         return employeeService.getAllEmployees();
@@ -110,6 +195,9 @@ public class EmployeeController {
     @Operation(
             summary = "Удаление сотрудника по ID",
             description = "Для удаления отправьте ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Employee deleted",
+                    content = @Content)})
     public void deleteEmployeeByID(@PathVariable Long id) {
 
         employeeService.deleteEmployee(id);

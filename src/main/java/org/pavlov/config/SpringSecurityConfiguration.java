@@ -5,9 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.authorization.AuthorityAuthorizationManager;
-import org.springframework.security.authorization.AuthorizationManager;
-import org.springframework.security.authorization.AuthorizationManagers;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -29,6 +27,7 @@ import static org.springframework.security.authorization.AuthorityAuthorizationM
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true)
 public class SpringSecurityConfiguration {
 
     interface AuthoritiesConverter extends Converter<Map<String, Object>, Collection<GrantedAuthority>> {}
@@ -70,8 +69,8 @@ public class SpringSecurityConfiguration {
 
         http.authorizeHttpRequests(requests -> {
 //            requests.requestMatchers("/api/v1/employee/**").hasAnyAuthority("user", "admin");
-            requests.requestMatchers("/api/v1/tasks/**").hasAuthority("admin");
-            requests.requestMatchers("/api/v1/employees/**").hasAuthority("user");
+//            requests.requestMatchers("/api/v1/tasks/**").hasAuthority("admin");
+//            requests.requestMatchers("/api/v1/employees/**").hasAuthority("user");
 //            requests.requestMatchers("/api/v1/employees/**").access(AuthorizationManagers
 //                    .allOf(AuthorityAuthorizationManager.hasAuthority("user"), AuthorityAuthorizationManager.hasAuthority("admin")));
             requests.requestMatchers("/api/v1/**").authenticated();

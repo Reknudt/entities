@@ -16,7 +16,6 @@ import java.util.List;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
-    private final EmployeeServiceImpl employeeService;
 
     @Transactional
     @Override
@@ -52,30 +51,7 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.delete(task);
     }
 
-    @Transactional
-    @Override
-    public void addEmployee(Long id, Long employeeId) {
-        Task task = findByIdOrThrow(id);
-        Employee employee = employeeService.findByIdOrThrow(employeeId);
-
-        List<Employee> employees = task.getEmployees();
-        employees.add(employee);
-        task.setEmployees(employees);
-        taskRepository.save(task);
-    }
-
-    @Override
-    public void removeEmployee(Long id, Long employeeId) {
-        Task task = findByIdOrThrow(id);
-        Employee employee = employeeService.findByIdOrThrow(employeeId);
-
-        List<Employee> employees = task.getEmployees();
-        employees.remove(employee);
-        task.setEmployees(employees);
-        taskRepository.save(task);
-    }
-
-    private Task findByIdOrThrow(Long id) {
+    public Task findByIdOrThrow(Long id) {
         return taskRepository.findById(id)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Task "+ id + " not found"));

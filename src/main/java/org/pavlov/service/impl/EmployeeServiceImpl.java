@@ -7,6 +7,7 @@ import org.pavlov.model.Task;
 import org.pavlov.repository.EmployeeRepository;
 import org.pavlov.response.TaskResponse;
 import org.pavlov.service.EmployeeService;
+import org.pavlov.service.TaskService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final TaskServiceImpl taskService;
 
     @Transactional
     @Override
@@ -34,7 +36,31 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setName(employeeRequest.getName());
         employee.setBossId(employeeRequest.getBossId());
         employee.setDepartmentId(employeeRequest.getDepartmentId());
+        employee.setTasks(employeeRequest.getTasks());
 
+        employeeRepository.save(employee);
+    }
+
+    @Transactional
+    @Override
+    public void updateTaskList(Long id, List<Task> tasks) {
+        Employee employee = findByIdOrThrow(id);
+        employee.setTasks(tasks);
+        employeeRepository.save(employee);
+    }
+
+    @Transactional
+    @Override
+    public void updateTasksById(Long id, List<Long> taskIds) {
+        Employee employee = findByIdOrThrow(id);
+        List<Task> newTasks = new ArrayList<>(List.of());
+
+        for (Long taskId : taskIds) {
+            Task task = taskService.findByIdOrThrow(taskId);
+            newTasks.add(task);
+        }
+
+        employee.setTasks(newTasks);
         employeeRepository.save(employee);
     }
 
@@ -77,7 +103,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         return Optional.ofNullable(tasks);
     }
 
-
     @Transactional
     @Override
     public List<Long> getAllByBossAlt(Long bossId) {
@@ -109,6 +134,29 @@ public class EmployeeServiceImpl implements EmployeeService {
         return newList;
     }
 
+    @Transactional
+    @Override
+    public void assignTask(Long id, Long taskId) {
+        Employee employee = findByIdOrThrow(id);
+        Task newTask = taskService.findByIdOrThrow(taskId);
+
+        List<Task> taskList = employee.getTasks();
+        taskList.add(newTask);
+        employee.setTasks(taskList);
+        employeeRepository.save(employee);
+    }
+
+    @Transactional
+    @Override
+    public void removeTask(Long id, Long taskId) {
+        Employee employee = findByIdOrThrow(id);
+        Task newTask = taskService.findByIdOrThrow(taskId);
+
+        List<Task> taskList = employee.getTasks();
+        taskList.remove(newTask);
+        employee.setTasks(taskList);
+        employeeRepository.save(employee);
+    }
 
     public Employee findByIdOrThrow(Long id) {
         return employeeRepository.findById(id)
